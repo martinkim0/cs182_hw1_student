@@ -24,7 +24,8 @@ def affine_forward(x, w, b):
     # TODO: Implement the affine forward pass. Store the result in out. You     #
     # will need to reshape the input into rows.                                 #
     #############################################################################
-    pass
+    x_temp = np.reshape(x, (x.shape[0], -1))
+    out = x_temp.dot(w) + b
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -52,7 +53,10 @@ def affine_backward(dout, cache):
     #############################################################################
     # TODO: Implement the affine backward pass.                                 #
     #############################################################################
-    pass
+    x_temp = np.reshape(x, (x.shape[0], -1))
+    dw = x_temp.T.dot(dout)
+    db = np.sum(dout.T, axis=-1)
+    dx = dout.dot(w.T).reshape(x.shape)
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -74,7 +78,7 @@ def relu_forward(x):
     #############################################################################
     # TODO: Implement the ReLU forward pass.                                    #
     #############################################################################
-    pass
+    out = np.maximum(0, x)
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -97,7 +101,8 @@ def relu_backward(dout, cache):
     #############################################################################
     # TODO: Implement the ReLU backward pass.                                   #
     #############################################################################
-    pass
+    dout_temp = dout.reshape(x.shape)
+    dx = np.multiply(dout_temp, np.sign(np.maximum(0, x)))
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -165,7 +170,12 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # the momentum variable to update the running mean and running variance,    #
         # storing your result in the running_mean and running_var variables.        #
         #############################################################################
-        pass
+        mean = np.mean(x, axis=0)
+        var = np.var(x, axis=0)
+        out = (x - mean) / var
+        out = gamma * out + beta
+        running_mean = momentum * running_mean + (1 - momentum) * mean
+        running_var = momentum * running_var + (1 - momentum) * var
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################
