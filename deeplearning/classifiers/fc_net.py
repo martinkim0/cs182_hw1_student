@@ -214,9 +214,12 @@ class FullyConnectedNet(object):
             self.params[f'b{i}'] = np.zeros(curr_dim)
 
             if use_batchnorm:
-                pass
+                self.params[f'gamma{i}'] = np.ones(curr_dim)
+                self.params[f'beta{i}'] = np.zeros(curr_dim)
 
             prev_dim = curr_dim
+
+
 
         ############################################################################
         #                             END OF YOUR CODE                             #

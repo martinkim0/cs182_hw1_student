@@ -175,6 +175,8 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         istd = 1 / np.sqrt(var + eps)
         x_norm = (x - mean) * istd
         out = gamma * x_norm + beta
+        print(running_mean.shape)
+        print(mean.shape)
         running_mean = momentum * running_mean + (1 - momentum) * mean
         running_var = momentum * running_var + (1 - momentum) * var
         cache = (
