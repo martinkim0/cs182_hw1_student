@@ -171,9 +171,10 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         # storing your result in the running_mean and running_var variables.        #
         #############################################################################
         mean = np.mean(x, axis=0)
-        var = np.var(x, axis=0)
+        x_mu = x - mean
+        var = np.mean(x_mu**2, axis=0)
         istd = 1 / np.sqrt(var + eps)
-        x_norm = (x - mean) * istd
+        x_norm = x_mu * istd
         out = gamma * x_norm + beta
 
         running_mean = momentum * running_mean + (1 - momentum) * mean
@@ -589,13 +590,17 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     # be very short; ours is less than five lines.                              #
     #############################################################################
     N, C, H, W = x.shape
+    x_temp = np.transpose(x, (0, 2, 3, 1))
+    x_temp = x_temp.reshape((N*W*H, C))
+
     out, cache = batchnorm_forward(
-        x.reshape((N*W*H, C)),
+        x_temp,
         gamma, 
         beta, 
         bn_param
     )
-    out = out.reshape(x.shape)
+    out = out.reshape((N, H, W, C))
+    out = np.transpose(out, (0, 3, 1, 2))
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -624,11 +629,16 @@ def spatial_batchnorm_backward(dout, cache):
     # version of batch normalization defined above. Your implementation should  #
     # be very short; ours is less than five lines.                              #
     #############################################################################
+    N, C, H, W = dout.shape
+    dout_temp = np.transpose(dout, (0, 2, 3, 1))
+    dout_temp = dout_temp.reshape((N*W*H, C))
+    
     dx, dgamma, dbeta = batchnorm_backward_alt(
-        dout.reshape((-1, dout.shape[1])),
+        dout_temp,
         cache
     )
-    dx = dx.reshape(dout.shape)
+    dx = dx.reshape((N, H, W, C))
+    dx = np.transpose(dx, (0, 3, 1, 2))
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
